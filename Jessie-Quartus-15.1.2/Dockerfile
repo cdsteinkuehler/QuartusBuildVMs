@@ -1,4 +1,4 @@
-FROM ouruser/jessie-quartus-base:latest
+FROM cdsteinkuehler/jessie-quartus-base:latest
 MAINTAINER Charles Steinkuehler <charles@steinkuehler.net>
 
 # Web download
@@ -17,7 +17,8 @@ ADD QuartusSetup-15.1.2.193-linux.run     /tmp/
 
 RUN cd /tmp/ && \
     chmod +x *.run && \
-    ./QuartusLiteSetup-15.1.0.185-linux.run --mode unattended && \
-    export PATH="$PATH:/root/altera_lite/15.1/quartus/bin:/root/altera_lite/15.1/quartus/sopc_builder/bin" \
-    xvfb-run -a tb2_install --enable
+    ./QuartusLiteSetup-15.1.0.185-linux.run --mode unattended
+
+ENV PATH $PATH:/root/altera_lite/15.1/quartus/bin:/root/altera_lite/15.1/quartus/sopc_builder/bin
+RUN xvfb-run -a tb2_install --enable
 
