@@ -9,7 +9,6 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 
 # turn off recommends on container OS
 # install required dependencies
-# Quartus tools (specifically the talkback installer) require a virtual X11 display
 RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
             /etc/apt/apt.conf.d/01norecommend && \
     apt-get update && \
@@ -22,7 +21,9 @@ RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
         xvfb
 
 # Set the locale, Quartus expects en_US.UTF-8
-run locale-gen en-US.UTF-8
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen
+
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
