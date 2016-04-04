@@ -1,0 +1,3 @@
+a8cadd1dc4af87008f1468e8df59065c3916f61d  cyclonev-15.1.0.185.qdz
+7639eb5655650e8448ef9f6d149f958de396275e  QuartusLiteSetup-15.1.0.185-linux.run
+b1cadeba9457f11a6a52ef6fdb9f5dfaad3344a9  QuartusSetup-15.1.2.193-linux.run
