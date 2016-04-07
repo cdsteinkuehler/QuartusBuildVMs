@@ -27,5 +27,9 @@ ENV PATH $PATH:/root/altera_lite/15.1/quartus/bin:/root/altera_lite/15.1/quartus
 RUN xvfb-run -a tb2_install --enable
 
 # Cleanup to save space
-RUN rm -rf /tmp/*
+RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
+    apt-get clean
+
+# !!!-WARNING-!!!
+# Flatten the resulting image or it will be GIGANTIC!
 
