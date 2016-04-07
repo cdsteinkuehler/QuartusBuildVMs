@@ -10,9 +10,10 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 # turn off recommends on container OS
 # install required dependencies
 RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
-            /etc/apt/apt.conf.d/01norecommend && \
+    /etc/apt/apt.conf.d/01norecommend && \
     apt-get update && \
     apt-get -y install \
+        ca-certificates \
         git \
         libfontconfig1 \
         libglib2.0-0 \
