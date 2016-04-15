@@ -32,4 +32,27 @@ RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
 
 # !!!-WARNING-!!!
 # Flatten the resulting image or it will be GIGANTIC!
+#
+# It is expected that at some point, Docker will have a native command
+# for doing this, but for now the following method is required.
+#
+# Create a container from the image:
+#   docker run <docker-image:big> /bin/true
+#
+# Find the container ID:
+#   docker ps -a
+#
+# Get the docker-rebase script from here:
+#   https://github.com/docbill/docker-scripts
+#
+# Rebase the big image to make it MUCH smaller:
+#   docker-rebase <container-ID> <docker-image:little>
+#
+# Tag the image as needed:
+#   docker tag <docker-image:little> <final-name:version>
+#   docker tag <docker-image:little> <final-name:latest>
+#
+# ...and push to the Docker hub:
+#   docker push <final-name:version>
+#   docker push <final-name:latest>
 
