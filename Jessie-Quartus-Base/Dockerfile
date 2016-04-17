@@ -15,6 +15,7 @@ RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
     apt-get -y install \
         ca-certificates \
         git \
+	openjdk-7-jdk \
         libfontconfig1 \
         libglib2.0-0 \
         libsm6 \

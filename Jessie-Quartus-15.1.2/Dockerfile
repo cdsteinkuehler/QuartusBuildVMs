@@ -30,6 +30,15 @@ RUN xvfb-run -a tb2_install --enable
 RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
     apt-get clean
 
+# Install sopc2dts
+RUN git clone --depth 1 https://github.com/altera-opensource/sopc2dts && \
+    make -C sopc2dts && \
+    mkdir -p /usr/local/share/sopc2dts && \
+    cp sopc2dts/sopc2dts.jar /usr/local/share/sopc2dts && \
+    /bin/echo -e '#!/bin/bash -e\njava -jar /usr/local/share/sopc2dts/sopc2dts.jar $*\n' > /usr/local/bin/sopc2dts && \
+    chmod +x /usr/local/bin/sopc2dts && \
+    rm -rf sopc2dts
+
 # !!!-WARNING-!!!
 # Flatten the resulting image or it will be GIGANTIC!
 #
