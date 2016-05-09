@@ -2,66 +2,53 @@ FROM cdsteinkuehler/jessie-quartus-base:latest
 MAINTAINER Charles Steinkuehler <charles@steinkuehler.net>
 
 # Web download
-ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/QuartusLiteSetup-15.1.0.185-linux.run /tmp/
-ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/cyclonev-15.1.0.185.qdz /tmp/
-ADD http://download.altera.com/akdlm/software/acdsinst/15.1.2/193/update/QuartusSetup-15.1.2.193-linux.run /tmp/
+#ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/QuartusLiteSetup-15.1.0.185-linux.run /tmp/
+#ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/cyclonev-15.1.0.185.qdz /tmp/
+#ADD http://download.altera.com/akdlm/software/acdsinst/15.1.2/193/update/QuartusSetup-15.1.2.193-linux.run /tmp/
 
 # Local files
-#ADD QuartusLiteSetup-15.1.0.185-linux.run /tmp/
-#ADD cyclonev-15.1.0.185.qdz               /tmp/
-#ADD QuartusSetup-15.1.2.193-linux.run     /tmp/
+ADD QuartusLiteSetup-15.1.0.185-linux.run /tmp/
+ADD cyclonev-15.1.0.185.qdz               /tmp/
+ADD QuartusSetup-15.1.2.193-linux.run     /tmp/
 
 # Verify Quartus files
 ADD sha1sums.txt /tmp/
-RUN cd /tmp/ && sha1sum -c sha1sums.txt
 
-# Install Quartus
-RUN cd /tmp/ && \
-    chmod +x *.run && \
-    ./QuartusLiteSetup-15.1.0.185-linux.run --mode unattended
 
-# Add Quartus bin directorys to the path
-ENV PATH $PATH:/root/altera_lite/15.1/quartus/bin:/root/altera_lite/15.1/quartus/sopc_builder/bin
-
-# Enable talkback (required to run SoC builds)
-RUN xvfb-run -a tb2_install --enable
-
-# Cleanup to save space
-RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
-    apt-get clean
-
-# Install sopc2dts
-RUN git clone --depth 1 https://github.com/altera-opensource/sopc2dts && \
+# create builder user
+# Install sopc2dts as root
+RUN groupadd -r builder -g 815 && \
+    useradd -u 813 -r -g builder -m -d /home/builder -s /bin/bash builder && \
+    git clone --depth 1 https://github.com/altera-opensource/sopc2dts && \
     make -C sopc2dts && \
     mkdir -p /usr/local/share/sopc2dts && \
     cp sopc2dts/sopc2dts.jar /usr/local/share/sopc2dts && \
     /bin/echo -e '#!/bin/bash -e\njava -jar /usr/local/share/sopc2dts/sopc2dts.jar $*\n' > /usr/local/bin/sopc2dts && \
     chmod +x /usr/local/bin/sopc2dts && \
-    rm -rf sopc2dts
+    rm -rf sopc2dts && \
+    cd /tmp/ && sha1sum -c sha1sums.txt && \
+    chmod +x *.run
 
-# !!!-WARNING-!!!
-# Flatten the resulting image or it will be GIGANTIC!
-#
-# It is expected that at some point, Docker will have a native command
-# for doing this, but for now the following method is required.
-#
-# Create a container from the image:
-#   docker run <docker-image:big> /bin/true
-#
-# Find the container ID:
-#   docker ps -a
-#
-# Get the docker-rebase script from here:
-#   https://github.com/docbill/docker-scripts
-#
-# Rebase the big image to make it MUCH smaller:
-#   docker-rebase <container-ID> <docker-image:little>
-#
-# Tag the image as needed:
-#   docker tag <docker-image:little> <final-name:version>
-#   docker tag <docker-image:little> <final-name:latest>
-#
-# ...and push to the Docker hub:
-#   docker push <final-name:version>
-#   docker push <final-name:latest>
+# Install Quartus as user builder
+# Enable talkback (required to run SoC builds)
+USER builder
+
+ENV HOME /home/builder
+
+# Add Quartus bin directorys to the path
+ENV PATH "$PATH:/home/builder/altera_lite/15.1/quartus/bin/:/home/builder/altera_lite/15.1/quartus/sopc_builder/bin/"
+
+RUN cd /tmp/ && \
+    ./QuartusLiteSetup-15.1.0.185-linux.run --mode unattended &&  \
+    xvfb-run -a tb2_install --enable
+
+# relax permissions on /home/builder so non-builder users can execute quartus
+# Cleanup to save space
+USER root
+
+RUN rm -rf /tmp/* /home/builder/altera_lite/15.1/uninstall && \
+    rm -rf /var/lib/apt/lists/* && \
+    chmod -R go+xr /home/builder && mv /home/builder /home/builder_new && mv /home/builder_new /home/builder
+#                           ^---------------------^
+# workaround weird bug: https://github.com/docker/docker/issues/783#issuecomment-212907954
 
