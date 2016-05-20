@@ -25,6 +25,10 @@ RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
         xauth \
         xvfb
 
+# Create a non-root user for builds
+RUN adduser --disabled-password --gecos '' builder && \
+    usermod builder -aG staff
+
 # Set the locale, Quartus expects en_US.UTF-8
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
     locale-gen
@@ -33,3 +37,4 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+USER builder
