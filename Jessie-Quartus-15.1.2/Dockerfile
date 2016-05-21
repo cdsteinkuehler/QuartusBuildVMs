@@ -4,14 +4,14 @@ MAINTAINER Charles Steinkuehler <charles@steinkuehler.net>
 USER root
 
 # Web download
-ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/QuartusLiteSetup-15.1.0.185-linux.run /tmp/
-ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/cyclonev-15.1.0.185.qdz /tmp/
-ADD http://download.altera.com/akdlm/software/acdsinst/15.1.2/193/update/QuartusSetup-15.1.2.193-linux.run /tmp/
+#ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/QuartusLiteSetup-15.1.0.185-linux.run /tmp/
+#ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/cyclonev-15.1.0.185.qdz /tmp/
+#ADD http://download.altera.com/akdlm/software/acdsinst/15.1.2/193/update/QuartusSetup-15.1.2.193-linux.run /tmp/
 
 # Local files
-#ADD QuartusLiteSetup-15.1.0.185-linux.run /tmp/
-#ADD cyclonev-15.1.0.185.qdz               /tmp/
-#ADD QuartusSetup-15.1.2.193-linux.run     /tmp/
+ADD QuartusLiteSetup-15.1.0.185-linux.run /tmp/
+ADD cyclonev-15.1.0.185.qdz               /tmp/
+ADD QuartusSetup-15.1.2.193-linux.run     /tmp/
 
 # Verify Quartus files
 ADD sha1sums.txt /tmp/
@@ -72,7 +72,11 @@ USER builder
 #   docker tag <docker-image:little> <final-name:version>
 #   docker tag <docker-image:little> <final-name:latest>
 #
+# You may want to limit your interface bandwidth to avoid killing your 'net connection:
+#   sudo wondershaper eth0 500000 5000
+#
 # ...and push to the Docker hub:
 #   docker push <final-name:version>
 #   docker push <final-name:latest>
-
+#
+#   sudo wondershaper clear eth0
