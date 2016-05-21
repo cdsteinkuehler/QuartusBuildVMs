@@ -1,6 +1,8 @@
 FROM cdsteinkuehler/jessie-quartus-base:latest
 MAINTAINER Charles Steinkuehler <charles@steinkuehler.net>
 
+USER root
+
 # Web download
 ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/QuartusLiteSetup-15.1.0.185-linux.run /tmp/
 ADD http://download.altera.com/akdlm/software/acdsinst/15.1/185/ib_installers/cyclonev-15.1.0.185.qdz /tmp/
@@ -15,29 +17,38 @@ ADD http://download.altera.com/akdlm/software/acdsinst/15.1.2/193/update/Quartus
 ADD sha1sums.txt /tmp/
 RUN cd /tmp/ && sha1sum -c sha1sums.txt
 
-# Install Quartus
+# Fix file permissions
 RUN cd /tmp/ && \
     chmod +x *.run && \
+    chmod +r *
+
+# Install Quartus
+USER builder
+RUN cd /tmp/ && \
     ./QuartusLiteSetup-15.1.0.185-linux.run --mode unattended
 
 # Add Quartus bin directorys to the path
-ENV PATH $PATH:/root/altera_lite/15.1/quartus/bin:/root/altera_lite/15.1/quartus/sopc_builder/bin
+ENV PATH $PATH:/home/builder/altera_lite/15.1/quartus/bin:/home/builder/altera_lite/15.1/quartus/sopc_builder/bin
 
 # Enable talkback (required to run SoC builds)
 RUN xvfb-run -a tb2_install --enable
 
-# Cleanup to save space
-RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
-    apt-get clean
-
 # Install sopc2dts
-RUN git clone --depth 1 https://github.com/altera-opensource/sopc2dts && \
+RUN cd && \
+    git clone --depth 1 https://github.com/altera-opensource/sopc2dts && \
     make -C sopc2dts && \
     mkdir -p /usr/local/share/sopc2dts && \
     cp sopc2dts/sopc2dts.jar /usr/local/share/sopc2dts && \
     /bin/echo -e '#!/bin/bash -e\njava -jar /usr/local/share/sopc2dts/sopc2dts.jar $*\n' > /usr/local/bin/sopc2dts && \
     chmod +x /usr/local/bin/sopc2dts && \
     rm -rf sopc2dts
+
+# Cleanup to save space
+USER root
+RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
+    apt-get clean
+
+USER builder
 
 # !!!-WARNING-!!!
 # Flatten the resulting image or it will be GIGANTIC!
