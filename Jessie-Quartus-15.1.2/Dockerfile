@@ -45,7 +45,7 @@ RUN cd && \
 
 # Cleanup to save space
 USER root
-RUN rm -rf /tmp/* /root/altera_lite/15.1/uninstall && \
+RUN rm -rf /tmp/* /home/builder/altera_lite/15.1/uninstall && \
     apt-get clean
 
 USER builder
