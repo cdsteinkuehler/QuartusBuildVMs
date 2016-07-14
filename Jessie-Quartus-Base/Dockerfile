@@ -23,7 +23,13 @@ RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
         locales \
         make \
         xauth \
-        xvfb
+        xvfb \
+	libprotobuf-dev \
+	protobuf-compiler \
+	python-protobuf \
+	python-pip && \
+    pip install intelhex
+
 
 # Create a non-root user for builds
 RUN adduser --disabled-password --gecos '' builder && \
