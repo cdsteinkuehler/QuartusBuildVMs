@@ -24,6 +24,7 @@ RUN echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > \
         make \
         xauth \
         xvfb \
+	pkg-config \
 	libprotobuf-dev \
 	protobuf-compiler \
 	python-protobuf \
